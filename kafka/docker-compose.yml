@@ -1,0 +1,26 @@
+version: '2'
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+      - "2181:2181"
+    container_name: zookeeper-container
+
+  kafka:
+    image: wurstmeister/kafka:1.1.0
+    ports:
+      - "9092:9092"
+    container_name: kafka-container
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    #command: "sh home/create-topic.sh"
+    #volumes:
+    #  - "./kafka_data:/home"
+    depends_on:
+      - zookeeper
+
+# volumes:
+#   kafka_data:
+#     driver: local
