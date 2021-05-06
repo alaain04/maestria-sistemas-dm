@@ -5,6 +5,8 @@ services:
     ports:
       - "2181:2181"
     container_name: zookeeper-container
+    networks:
+      - kafka-net
 
   kafka:
     image: wurstmeister/kafka:1.1.0
@@ -12,15 +14,41 @@ services:
       - "9092:9092"
     container_name: kafka-container
     environment:
-      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ADVERTISED_HOST_NAME: kafka
       KAFKA_ADVERTISED_PORT: 9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-    #command: "sh home/create-topic.sh"
-    #volumes:
-    #  - "./kafka_data:/home"
+      KAFKA_CREATE_TOPICS: "orders-topic:1:1"
+    networks:
+      - kafka-net
     depends_on:
       - zookeeper
+  
+  consumer:
+    build: ./consumer
+    image: consumer-kafka
+    container_name: consumer-container
+    restart: always
+    networks:
+      - kafka-net
+    # depends_on:
+    #   - kafka
 
-# volumes:
-#   kafka_data:
-#     driver: local
+  producer:
+    build: ./producer
+    image: producer-kafka
+    container_name: producer-container
+    restart: always
+    volumes: 
+      - "data:/app"
+    networks:
+      - kafka-net
+    # depends_on:
+    #   - kafka
+    #   - consumer
+
+volumes:
+  data:
+    
+networks:
+  kafka-net:
+    driver: bridge
