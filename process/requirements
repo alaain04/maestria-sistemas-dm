@@ -1,0 +1,5 @@
+pandas == 1.2.4
+scikit-learn == 0.24.2
+Flask == 2.0.0
+river == 0.7.0
+requests == 2.25.1
